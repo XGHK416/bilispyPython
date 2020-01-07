@@ -11,7 +11,7 @@ class UserInfo(object):
     birthday = ''
     vip = ''
 
-    def __init__(self, mid, name, sex, face, level, birthday, coins, vip):
+    def __init__(self, mid, name, sex, face, level, birthday, vip):
         self.level = level
         self.birthday = birthday
         self.face = face
@@ -21,10 +21,10 @@ class UserInfo(object):
         self.mid = mid
 
     def return_tup(self):
-        return(self.mid,
-               self.name,
-               self.birthday,
-               self.face,
-               self.level,
-               self.sex,
-               self.vip)
+        return (self.mid,
+                self.name,
+                self.birthday,
+                self.face,
+                self.level,
+                self.sex,
+                self.vip)
