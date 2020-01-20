@@ -7,17 +7,34 @@ class Db(object):
     db = None
 
     def start_sql_engine(self):
-        self.db = pymysql.connect(host='120.78.136.84', user='android', password='Android-123', db='android')
+        self.db = pymysql.connect(host='39.106.228.42', user='Myself', password='hongzi123', db='Myself')
         self.cursor = self.db.cursor()
 
     def insert(self, item, sql):
         try:
-            self.cursor.execute(sql, item.return_tup())
+            # print(sql)
+            if isinstance(item, tuple):
+                self.cursor.execute(sql, item.return_tup())
+            else:
+                self.cursor.execute(sql,item)
             self.db.commit()
         except Exception as exc:
             print(exc)
             self.db.rollback()
             print("error")
+            self.db.close()
+
+    def select(self, sql):
+        try:
+            # print(sql)
+            self.cursor.execute(sql)
+            res = self.cursor.fetchall()
+            return res
+        except Exception as exc:
+            print(exc)
+            self.db.rollback()
+            print("error")
+            self.db.close()
 
     def close_db(self):
         self.db.close()

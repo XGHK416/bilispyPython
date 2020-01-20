@@ -2,6 +2,7 @@
 
 
 def write_in_txt(mid):
+    print("write..."+str(mid))
     with open(r'UserMid.txt', 'a', encoding="utf-8") as file:
         file.write(str(mid))
         file.write('\n')
@@ -18,4 +19,4 @@ def read_from_txt():
 
 
 if __name__ == '__main__':
-    read_from_txt()
+    write_in_txt(112312)
