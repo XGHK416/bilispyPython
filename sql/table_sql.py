@@ -21,7 +21,7 @@ def video_info():
 
 
 def uv_count():
-    sql = 'INSERT INTO bili_uv_count(tid,count,name,user_id)values(%s,%s,%s,%s) '
+    sql = 'REPLACE INTO bili_uv_count(tid,count,name,user_id)values(%s,%s,%s,%s) '
     return sql
 
 

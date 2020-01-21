@@ -16,8 +16,8 @@ def return_user_follower_following(mid):
     return 'https://api.bilibili.com/x/relation/stat?vmid=' + str(mid) + '&jsonp=jsonp'
 
 
-def return_video_info(mid):
-    return 'https://api.bilibili.com/x/web-interface/view?aid=' + str(mid)
+def return_video_info(aid):
+    return 'https://api.bilibili.com/x/web-interface/view?aid=' + str(aid)
 
 
 def return_user_video_count(mid):

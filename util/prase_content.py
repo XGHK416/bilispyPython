@@ -1,7 +1,9 @@
-#解析网址
-
+# 解析网址
+import random
 import re
 import json
+import time
+
 import requests
 from requests import RequestException
 
@@ -20,3 +22,10 @@ def return_html(url, data, head):
 
 def html_to_json(html):
     return json.loads(html)
+
+
+def return_json(url, data, head):
+    html = return_html(url, data, head)
+    result = html_to_json(html)
+    time.sleep(random.random())
+    return result
