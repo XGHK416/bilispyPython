@@ -34,10 +34,10 @@ class UserInfo(object):
         self.user_id = user_id
 
     def return_tup(self):
-        return [int(self.user_id), self.nick_name, self.profile, self.sex, self.level, self.sign, int(self.silence),
+        return (int(self.user_id), self.nick_name, self.profile, self.sex, self.level, self.sign, int(self.silence),
                 self.vip,
                 self.birthday, self.video_count,
-                int(self.follower), int(self.following)]
+                int(self.follower), int(self.following))
 
 
 class UserOfficial(object):
@@ -53,7 +53,7 @@ class UserOfficial(object):
         self.user_id = user_id
 
     def return_tup(self):
-        return [self.user_id, self.role, self.title, self.desc]
+        return (self.user_id, self.role, self.title, self.desc)
 
 
 class UserVideoCount(object):
@@ -69,7 +69,7 @@ class UserVideoCount(object):
         self.user_id = user_id
 
     def return_tup(self):
-        return [self.tid, self.count, self.name, self.user_id]
+        return (self.tid, self.count, self.name, self.user_id)
 
 
 # class UserVideo(object):

@@ -14,18 +14,18 @@ def user_official():
     return sql
 
 
+def uv_count():
+    sql = 'REPLACE INTO bili_uv_count(tid,count,name,user_id)values(%s,%s,%s,%s)'
+    return sql
+
+
+######################################
 def video_info():
     sql = 'INSERT INTO bili_video(video_id,tid,video_title,video_profile,create_time,video_desc,video_view,video_favorite,coins,video_share,video_like,reply,dynamic)' \
           'values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
     return sql
 
 
-def uv_count():
-    sql = 'REPLACE INTO bili_uv_count(tid,count,name,user_id)values(%s,%s,%s,%s) '
-    return sql
-
-
-######################################
 # 检查昨日用户视频数
 def check_update_video(mid):
     sql = 'SELECT video_count from bili_user where to_days(now())-to_days(last_update)=1 and user_id =' + str(mid)
@@ -46,4 +46,4 @@ def query_update_video_list():
 
 # 对已经更新过的视频检测数+1
 def complete_detect(aid):
-    sql = 'update bili_video_detect_list set have_detect=have_detect+1 where video_id = '+str(aid)
+    sql = 'update bili_video_detect_list set have_detect=have_detect+1 where video_id = ' + str(aid)

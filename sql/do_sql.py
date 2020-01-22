@@ -13,10 +13,7 @@ class Db(object):
     def insert(self, item, sql):
         try:
             # print(sql)
-            if isinstance(item, tuple):
-                self.cursor.execute(sql, item.return_tup())
-            else:
-                self.cursor.execute(sql,item)
+            self.cursor.execute(sql, item)
             self.db.commit()
         except Exception as exc:
             print(exc)
