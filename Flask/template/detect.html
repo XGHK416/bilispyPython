@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>监控平台</title>
+    <script type="text/javascript" src="//cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+        $(function () {
+            function do_detect(){
+                $.get("/get_detect_info",function (data) {
+                    var datas = eval('(' + data + ')')
+                    console.log(datas)
+                    $('#action').html("当前进行进程: "+datas['current_task'])
+                    $('#spider_num').html("以爬取数据: "+datas['current_spider_num'])
+                })
+            }
+            setInterval(do_detect,5000)
+
+        })
+    </script>
+    <script type="text/css">
+        html,body{
+            margin: 0 auto;
+            padding: 0;
+        }
+        #main{
+            height: 500px;
+            margin: 0 auto;
+            padding: 0;
+            text-align: center;
+        }
+        #action{
+
+        }
+    </script>
+</head>
+<body>
+    <div id="main">
+        <h1 style="text-align: center;">BiliSpy Python数据监控</h1>
+        <hr>
+        <div style="width: 100%;text-align: center">
+            <h2 id="action">
+            当前进行进程：无进程运行
+            </h2>
+            <h2 id="spider_num">以爬取数据：--</h2>
+        </div>
+    </div>
+</body>
+
+</html>

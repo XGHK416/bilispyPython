@@ -9,9 +9,10 @@ from util import prase_content
 import random
 from sql import table_sql
 from sql.do_sql import Db
+from item import global_val as gl
 
 INIT_USER = 3043120
-MAX_USER_NUM = 10
+MAX_USER_NUM = 20000
 START_NUM = 0
 
 db = Db()
@@ -49,6 +50,8 @@ def init_parse_user(mid):
     for i in user_following:
         parse_user_info(i.get('mid'))
         START_NUM = START_NUM + 1
+        gl.set_value('CURRENT_USER_NUM', START_NUM)
+
     # 随机抽取一个人并开始下一个迭代
     user_list = user_following + user_follower
     random_user = user_list[random.randint(0, len(user_list) - 1)]
@@ -64,12 +67,13 @@ def update_parse_user():
     global db
     db.start_sql_engine()
     user_list = txt_io.read_from_txt()
-    for mid in user_list:
+    for index, mid in user_list:
         parse_user_info(mid)
+        gl.set_value('CURRENT_USER_NUM', index+1)
     db.close_db()
 
 
-# 将用户基本信息插入数据库并返回用户对象
+# 将用户基本信息插入数据库并返回用户对象，被调用
 def parse_user_info(mid):
     global MAX_USER_NUM, START_NUM, db
 
@@ -106,6 +110,7 @@ def update_video():
 
     # 对数据库里需要更新的数据进行爬取
     need_update_id_list = db.select(table_sql.query_update_video_list())
+    gl.set_value('CURRENT_VIDEO_NUM', len(need_update_id_list))
     for update_aid in need_update_id_list:
         update_old_video(update_aid)
 
@@ -131,9 +136,10 @@ def insert_new_video(mid):
             aid = video_list[more_video].get('aid')
             # 添加视频监控
             new_video_detect(aid)
+            gl.set_value('NEW_ADD_VIDEO_NUM', gl.get_value('NEW_ADD_VIDEO_NUM') + 1)
 
 
-# 更新视频检测
+# 更新视频检测，被调用
 def update_old_video(aid):
     video_json = prase_content.return_json(api.return_video_info(aid), None, return_header())
     video_info = package.package_video_info(video_json)
@@ -141,7 +147,7 @@ def update_old_video(aid):
     db.insert(item=None, sql=table_sql.complete_detect(aid))
 
 
-# 添加新视频检测
+# 添加新视频检测，被调用
 def new_video_detect(aid):
     db.insert(item=aid, sql=table_sql.add_update_video())
     # 插入视频数据
