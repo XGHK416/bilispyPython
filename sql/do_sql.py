@@ -10,7 +10,7 @@ class Db(object):
         self.db = pymysql.connect(host='39.106.228.42', user='Myself', password='hongzi123', db='Myself')
         self.cursor = self.db.cursor()
 
-    def insert(self, item, sql):
+    def insert_or_update(self, item, sql):
         try:
             # print(sql)
             self.cursor.execute(sql, item)

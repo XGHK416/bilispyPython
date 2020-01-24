@@ -1,6 +1,6 @@
 # 对对象进行封装
 
-from item import user
+from item import user, detect
 from item import video
 from util import enum
 import time
@@ -65,3 +65,4 @@ def package_video_count(user_video_category, mid):
         count=user_video_category.get('count'),
         name=user_video_category.get('name'),
     )
+
