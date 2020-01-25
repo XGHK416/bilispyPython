@@ -12,7 +12,7 @@ from sql.do_sql import Db
 from item import global_val as gl
 
 INIT_USER = 3043120
-MAX_USER_NUM = 20000
+MAX_USER_NUM = 20
 START_NUM = 0
 
 db = Db()
@@ -48,6 +48,7 @@ def init_parse_user(mid):
                                               return_header()).get('data').get('list')
     # 将关注的人放入数据库，即这些人为爬取对象
     for i in user_following:
+        print(i.get('mid'))
         # parse_user_info(i.get('mid'))
         db.insert_or_update(i.get('mid'), table_sql.insert_user_detect())
         START_NUM = START_NUM + 1
@@ -68,8 +69,9 @@ def update_parse_user():
     global db
     db.start_sql_engine()
     user_list = db.select(table_sql.query_detect_list(0))
-    for index, mid in user_list:
-        parse_user_info(mid)
+    print(list(user_list))
+    for index, mid in enumerate(list(user_list)):
+        parse_user_info(mid[0])
         gl.set_value('CURRENT_USER_NUM', index + 1)
     db.close_db()
 
@@ -79,6 +81,7 @@ def parse_user_info(mid):
     global MAX_USER_NUM, START_NUM, db
 
     # 用户基本信息解析
+    print('parse .....')
     print(mid)
     user_info_json = prase_content.return_json(api.return_user_info(mid), None, return_header())
     user_info_ff_json = prase_content.return_json(api.return_user_follower_following(mid), None, return_header())
@@ -87,15 +90,15 @@ def parse_user_info(mid):
     user_object = package.package_user_info(user_info_json, user_info_ff_json, user_video_count)
     user_official = package.package_user_official(user_info_json)
 
-    db.insert(item=user_object.return_tup(), sql=table_sql.insert_user_info())
-    db.insert(item=user_official.return_tup(), sql=table_sql.replace_user_official())
+    db.insert_or_update(item=user_object.return_tup(), sql=table_sql.insert_user_info())
+    db.insert_or_update(item=user_official.return_tup(), sql=table_sql.replace_user_official())
 
     # 用户视频主要分布统计
     user_video_category = user_video_count_json.get('data').get('tlist')
     for i in user_video_category:
         uv_info = package.package_video_count(user_video_category[i], user_info_json.get('data').get('mid'))
-        db.insert(item=uv_info.return_tup(), sql=table_sql.replace_uv_count())
-
+        db.insert_or_update(item=uv_info.return_tup(), sql=table_sql.replace_uv_count())
+    print('parsed')
     return user_object
 
 
@@ -109,14 +112,18 @@ def update_video():
 
     # 对数据库里需要更新的数据进行爬取
     need_update_id_list = db.select(table_sql.query_update_video_list())
-    gl.set_value('CURRENT_VIDEO_NUM', len(need_update_id_list))
-    for update_aid in need_update_id_list:
-        update_old_video(update_aid)
+    gl.set_value('CURRENT_yesterday_video_count', len(need_update_id_list))
+    print('更新视频数'+str(len(need_update_id_list)))
+    if len(need_update_id_list) == 0:
+        pass
+    else:
+        for update_aid in need_update_id_list:
+            update_old_video(update_aid)
 
     # 检查所有爬取用户有没有更新视频
     user_list = db.select(table_sql.query_detect_list(0))
     for mid in user_list:
-        insert_new_video(mid)
+        insert_new_video(mid[0])
 
     db.close_db()
 
@@ -124,18 +131,20 @@ def update_video():
 # 添加用户新视频检测
 def insert_new_video(mid):
     global db
-    video_num = db.select(table_sql.query_yesterday_user_video_count(mid))
-    # print(video_num)
-
-    current_video_count_json = prase_content.return_json(api.return_user_video_count(mid), None, return_header())
-    current_video_count = current_video_count_json.get('data').get('count')
-    if video_num < current_video_count:
-        video_list = current_video_count_json.get('data').get('vlist')
-        for more_video in range(current_video_count - video_num):
-            aid = video_list[more_video].get('aid')
-            # 添加视频监控
-            new_video_detect(aid)
-            gl.set_value('NEW_ADD_VIDEO_NUM', gl.get_value('NEW_ADD_VIDEO_NUM') + 1)
+    yesterday_video_count = db.select(table_sql.query_yesterday_user_video_count(mid))
+    print('mid: '+str(mid)+'; 昨日视频数:'+str(len(yesterday_video_count)))
+    # print(yesterday_video_count)
+    if len(yesterday_video_count) != 0:
+        current_video_count_json = prase_content.return_json(api.return_user_video_count(mid), None, return_header())
+        current_video_count = current_video_count_json.get('data').get('count')
+        print('mid:'+str(mid)+'; 更新数: '+str(current_video_count - yesterday_video_count))
+        if yesterday_video_count < current_video_count:
+            video_list = current_video_count_json.get('data').get('vlist')
+            for more_video in range(current_video_count - yesterday_video_count):
+                aid = video_list[more_video].get('aid')
+                # 添加视频监控
+                new_video_detect(aid)
+                gl.set_value('NEW_ADD_yesterday_video_count', gl.get_value('NEW_ADD_yesterday_video_count') + 1)
 
 
 # 更新视频检测，被调用

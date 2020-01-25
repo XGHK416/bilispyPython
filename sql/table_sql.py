@@ -2,12 +2,12 @@
 
 
 def insert_user_detect():
-    sql = 'INSERT INTO bili_detect(detect_id,detect_type,create_time) values (%s,0,now())'
+    sql = 'REPLACE INTO bili_detect(detect_id,detect_type,create_time) values (%s,0,now())'
     return sql
 
 
 def query_detect_list(detect_type):
-    sql = 'SELECT detect_id from bili_detect where type = ' + str(detect_type) + 'ORDER BY create_time DESC'
+    sql = 'SELECT detect_id from bili_detect where detect_type = ' + str(detect_type) + ' ORDER BY create_time DESC'
     return sql
 
 
