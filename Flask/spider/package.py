@@ -1,8 +1,8 @@
 # 对对象进行封装
 
-from item import user, detect
-from item import video
-from util import enum
+from Flask.item import user
+from Flask.item import video
+from Flask.util import enum
 import time
 
 
