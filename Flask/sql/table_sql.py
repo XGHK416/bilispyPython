@@ -21,7 +21,7 @@ def insert_user_info():
 
 
 def replace_user_official():
-    sql = 'REPLACE INTO bili_official(user_id,role,title,bili_official.desc) values (%s,%s,%s,%s)'
+    sql = 'REPLACE INTO bili_official(user_id,role,title,bili_official.desc,update_time) values (%s,%s,%s,%s,now())'
     return sql
 
 
@@ -45,7 +45,7 @@ def query_yesterday_user_video_count(mid):
 
 # 新建需要更新的视频列表
 def insert_detect_video():
-    sql = 'INSERT INTO bili_detect(detect_id,detect_type,have_detect,max_detect,update_time)values(%s,1,1,7,now()) '
+    sql = 'INSERT INTO bili_detect(detect_id,detect_type,have_detect,max_detect,update_time,create_time)values(%s,1,1,7,now(),now()) '
     return sql
 
 
@@ -57,5 +57,5 @@ def query_update_video_list():
 
 # 对已经更新过的视频检测数+1
 def update_video_detect_time(aid):
-    sql = 'update bili_detect set have_detect=have_detect+1 where detect_id = ' + str(aid)+'and detect_type='+str(1)
+    sql = 'update bili_detect set have_detect=have_detect+1 where detect_id = ' + str(aid)+' and detect_type=1'
     return sql

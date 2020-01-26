@@ -1,5 +1,5 @@
-from item import global_val as gl
-from spider import spider
+from Flask.item import global_val as gl
+from Flask.spider import spider
 
 
 def make_test():
@@ -12,11 +12,13 @@ def user_init():
 
 
 # 第一日测试成功
+# 第二日测试成功
 def user_update():
     spider.update_parse_user()
 
 
 # 第一日测试成功
+# 第二日第一部分测试完成
 def update_video():
     spider.update_video()
 
@@ -25,6 +27,6 @@ if __name__ == '__main__':
     gl._init()
     print("开始测试")
     # user_init()
-    user_update()
+    # user_update()
     update_video()
     print("结束测试")

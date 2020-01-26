@@ -1,11 +1,10 @@
 # app.py
 import datetime
-from spider import spider
 from flask import Flask, render_template
 
 from flask_apscheduler import APScheduler
-from item import global_val as gl
-from test import test
+from Flask.item import global_val as gl
+from Flask.spider import spider
 
 
 class Config(object):
@@ -13,10 +12,19 @@ class Config(object):
 
 
 scheduler = APScheduler()
+
+gl._init()
+gl.set_value('CURRENT_USER_NUM', 0)
+gl.set_value('ALL_USER_NUM', 0)
+gl.set_value('CURRENT_VIDEO_NUM', 0)
+gl.set_value('NEW_ADD_VIDEO_NUM', 0)
+gl.set_value('CURRENT_TASK', '--')
+gl.set_value('INIT_MID', 3043120)
+
 app = Flask(__name__, template_folder="./template")
 
 # 测试
-@scheduler.task('date', id='test_1', run_date=datetime.datetime(2020, 1, 23, 21, 56, 0),
+@scheduler.task('cron', id='test_1', run_date=datetime.datetime(2020, 1, 23, 21, 56, 0),
                 misfire_grace_time=900)
 def test_1():
     print(gl.get_value('CURRENT_USER_NUM'))
@@ -102,13 +110,7 @@ def index():
 #
 
 if __name__ == "__main__":
-    gl._init()
-    gl.set_value('CURRENT_USER_NUM', 0)
-    gl.set_value('ALL_USER_NUM', 0)
-    gl.set_value('CURRENT_VIDEO_NUM', 0)
-    gl.set_value('NEW_ADD_VIDEO_NUM', 0)
-    gl.set_value('CURRENT_TASK', '--')
-    gl.set_value('INIT_MID', 3043120)
+
 
     app.config.from_object(Config())
     # it is also possible to enable the API directly
