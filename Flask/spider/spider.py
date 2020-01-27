@@ -113,7 +113,7 @@ def update_video():
     need_update_id_list = db.select(table_sql.query_update_video_list())
     if len(need_update_id_list) != 0:
         print('更新人数为：'+str(len(need_update_id_list)))
-        for update_aid in need_update_id_list[0]:
+        for update_aid in need_update_id_list:
             update_old_video(update_aid[0])
 
     # 检查所有爬取用户有没有更新视频
@@ -131,11 +131,13 @@ def insert_new_video(mid):
     yesterday_video_count = db.select(table_sql.query_yesterday_user_video_count(mid))[0][0]
     print('mid: '+str(mid)+'; 昨日视频数:'+str(yesterday_video_count))
     # print(yesterday_video_count)
-    current_video_count_json = prase_content.return_json(api.return_user_video_count(mid), None, return_header())
+    current_video_count_json = prase_content.return_json(api.return_user_video_count(mid, None), None, return_header())
     current_video_count = current_video_count_json.get('data').get('count')
+    current_video_list_json = prase_content.return_json(api.return_user_video_count(mid, current_video_count - yesterday_video_count), None, return_header())
     print('更新数: '+str(current_video_count - yesterday_video_count))
     if yesterday_video_count < current_video_count:
-        video_list = current_video_count_json.get('data').get('vlist')
+        print()
+        video_list = current_video_list_json.get('data').get('vlist')
         for more_video in range(current_video_count - yesterday_video_count):
             aid = video_list[more_video].get('aid')
             # 添加视频监控

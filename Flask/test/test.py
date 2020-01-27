@@ -13,12 +13,14 @@ def user_init():
 
 # 第一日测试成功
 # 第二日测试成功
+# 第三日测试成功
 def user_update():
     spider.update_parse_user()
 
 
 # 第一日测试成功
 # 第二日第一部分测试完成
+# 第三日测试成功
 def update_video():
     spider.update_video()
 

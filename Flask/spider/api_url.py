@@ -20,6 +20,10 @@ def return_video_info(aid):
     return 'https://api.bilibili.com/x/web-interface/view?aid=' + str(aid)
 
 
-def return_user_video_count(mid):
-    return 'https://space.bilibili.com/ajax/member/getSubmitVideos?mid=' + str(
-        mid) + '&pagesize=1&tid=0&page=1&order=pubdate'
+def return_user_video_count(mid, num):
+    if num is not None:
+        return 'https://space.bilibili.com/ajax/member/getSubmitVideos?mid=' + str(
+            mid) + '&pagesize=' + str(num) + '&tid=0&page=1&order=pubdate'
+    else:
+        return 'https://space.bilibili.com/ajax/member/getSubmitVideos?mid=' + str(
+            mid) + '&pagesize=1&tid=0&page=1&order=pubdate'

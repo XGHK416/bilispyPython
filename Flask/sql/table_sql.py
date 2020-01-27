@@ -32,8 +32,8 @@ def replace_uv_count():
 
 ######################################
 def insert_video_info():
-    sql = 'INSERT INTO bili_video(video_id,tid,video_title,video_profile,last_update,video_desc,video_view,video_favorite,coins,video_share,video_like,reply,dynamic)' \
-          'values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+    sql = 'INSERT INTO bili_video(video_id,tid,video_title,video_profile,create_time,video_desc,video_view,video_favorite,coins,video_share,video_like,reply,dynamic,video_author,author_mid,last_update)' \
+          'values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now())'
     return sql
 
 

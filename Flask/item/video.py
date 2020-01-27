@@ -16,10 +16,15 @@ class VideoInfo(object):
     video_like = 0
     reply = 0
     dynamic = ''
+    video_author = ''
+    author_mid = 0
 
     def __init__(self, video_id, tid, video_title, video_profile, create_time, video_desc, video_view, video_favorite,
                  coins, video_share, video_like,
-                 reply, dynamic):
+                 reply, dynamic,
+                 video_author, author_mid):
+        self.author_mid = author_mid
+        self.video_author = video_author
         self.dynamic = dynamic
         self.replay = reply
         self.video_like = video_like
@@ -40,4 +45,5 @@ class VideoInfo(object):
                 self.video_view, self.video_favorite,
                 self.coins, self.video_share,
                 self.video_like, self.reply,
-                self.dynamic,)
+                self.dynamic,
+                self.video_author, self.author_mid)

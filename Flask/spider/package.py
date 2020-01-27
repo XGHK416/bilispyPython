@@ -46,6 +46,8 @@ def package_video_info(video_info):
         video_like=video_data.get('stat').get('like'),
         reply=video_data.get('stat').get('reply'),
         dynamic=video_data.get('dynamic'),
+        video_author=video_data.get('owner').get('name'),
+        author_mid=video_data.get('owner').get('mid'),
     )
 
 
