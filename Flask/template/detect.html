@@ -11,7 +11,8 @@
                     var datas = eval('(' + data + ')')
                     console.log(datas)
                     $('#action').html("当前进行进程: "+datas['current_task'])
-                    $('#spider_num').html("以爬取数据: "+datas['current_spider_num'])
+                    $('#spider_user_num').html("以爬取用户数据: "+datas['current_user_num'])
+                    $('#spider_video_num').html("以爬取视频数据: "+datas['current_video_num'])
                 })
             }
             setInterval(do_detect,5000)
@@ -42,7 +43,8 @@
             <h2 id="action">
             当前进行进程：无进程运行
             </h2>
-            <h2 id="spider_num">以爬取数据：--</h2>
+            <h2 id="spider_user_num">以更新用户数据：--</h2>
+            <h2 id="spider_video_num">以更新视频数据：--</h2>
         </div>
     </div>
 </body>

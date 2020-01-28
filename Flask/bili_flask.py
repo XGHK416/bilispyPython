@@ -1,5 +1,6 @@
 # app.py
 import datetime
+import logging
 from flask import Flask, render_template
 
 from flask_apscheduler import APScheduler
@@ -14,52 +15,59 @@ class Config(object):
 scheduler = APScheduler()
 
 gl._init()
-gl.set_value('CURRENT_USER_NUM', 0)
-gl.set_value('ALL_USER_NUM', 0)
+gl.set_value('TOTAL_VIDEO_NUM', 0)
+gl.set_value('TOTAL_USER_NUM', 0)
 gl.set_value('CURRENT_VIDEO_NUM', 0)
-gl.set_value('NEW_ADD_VIDEO_NUM', 0)
-gl.set_value('CURRENT_TASK', '--')
+gl.set_value('CURRENT_USER_NUM', 0)
+gl.set_value('TASK_NAME', '--')
 gl.set_value('INIT_MID', 3043120)
 
 app = Flask(__name__, template_folder="./template")
 
-# 测试
-@scheduler.task('cron', id='test_1', run_date=datetime.datetime(2020, 1, 23, 21, 56, 0),
-                misfire_grace_time=900)
-def test_1():
-    print(gl.get_value('CURRENT_USER_NUM'))
+
 #######################################################
 # 初始化爬虫用户
-@scheduler.task('date', id='init_parse_data', run_date=datetime.datetime(2020, 1, 30, 12, 0, 0),
+@scheduler.task('date', id='init_parse_data', run_date=datetime.datetime(2020, 1, 28, 12, 0, 0),
                 misfire_grace_time=900)
 def init_spider_user():
     try:
+        gl.set_value('TASK_NAME', '初始化爬取用户')
+        start = datetime.datetime.now()
         spider.init_parse_data()
-        gl.set_value('ALL_USER_NUM', gl.get_value('CURRENT_USER_NUM'))
-        gl.set_value('CURRENT_USER_NUM',0)
+        end = datetime.datetime.now()
+        runtime = start-end
+        app.logger.debug('init_runtime:'+str(runtime))
+        gl.set_value('TOTAL_USER_NUM', gl.get_value('CURRENT_USER_NUM'))
+        gl.set_value('CURRENT_USER_NUM', 0)
+        gl.set_value('TASK_NAME', '--')
     except Exception as exc:
         print(exc)
         scheduler.pause_job('init_parse_data')
 
 
 # 更新用户
-@scheduler.task('cron', id='update_spider_user', start_date='2020-02-1', day_of_week=1, hour='12',
+@scheduler.task('cron', id='update_spider_user', start_date='2020-02-1', day_of_week='*', hour='4',
                 misfire_grace_time=900)
 def update_spider_user():
     try:
+        gl.set_value('TASK_NAME', '更新用户爬取')
         spider.update_parse_user()
-
+        gl.set_value('TASK_NAME', '--')
+        gl.set_value('CURRENT_USER_NUM',0)
     except Exception as exc:
         print(exc)
         scheduler.pause_job('update_spider_user')
 
 
 # 更新视频
-@scheduler.task('cron', id='update_video', start_date='2020-02-1', day_of_week=0, hour='4',
+@scheduler.task('cron', id='update_video', start_date='2020-02-1', day_of_week='*', hour='12',
                 misfire_grace_time=900)
 def update_video():
     try:
+        gl.set_value('TASK_NAME', '更新视频资源')
         spider.update_video()
+        gl.set_value('TASK_NAME', '--')
+        gl.set_value('CURRENT_VIDEO_NUM', 0)
     except Exception as exc:
         print(exc)
         scheduler.pause_job('update_video')
@@ -71,7 +79,7 @@ def get_detect_info():
     result = {}
     result['state'] = 200
     result['scheduler_state'] = scheduler.state
-    result['current_task'] = gl.get_value('CURRENT_TASK')
+    result['current_task'] = gl.get_value('TASK_NAME')
     result['current_user_num'] = gl.get_value('CURRENT_USER_NUM')
     result['current_video_num'] = gl.get_value('CURRENT_VIDEO_NUM')
     return str(result)
@@ -108,10 +116,14 @@ def index():
 #         socketio.emit("response", {"data": CURRENT_USER_NUM}, namespace="/bili_spider")
 #         socketio.sleep(5)
 #
+if __name__ != "__main__":
+    app.config.from_object(Config())
+    # it is also possible to enable the API directly
+    # scheduler.api_enabled = True
+    scheduler.init_app(app)
+    scheduler.start()
 
 if __name__ == "__main__":
-
-
     app.config.from_object(Config())
     # it is also possible to enable the API directly
     # scheduler.api_enabled = True
