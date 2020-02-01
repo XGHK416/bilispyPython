@@ -1,4 +1,6 @@
 # 对数据库进行操作
+import logging
+
 import pymysql
 
 
@@ -16,9 +18,8 @@ class Db(object):
             self.cursor.execute(sql, item)
             self.db.commit()
         except Exception as exc:
-            print(exc)
+            logging.error(exc)
             self.db.rollback()
-            print("error")
             self.db.close()
 
     def select(self, sql):
@@ -28,9 +29,8 @@ class Db(object):
             res = self.cursor.fetchall()
             return res
         except Exception as exc:
-            print(exc)
+            logging.error(exc)
             self.db.rollback()
-            print("error")
             self.db.close()
 
     def close_db(self):

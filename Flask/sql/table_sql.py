@@ -7,7 +7,7 @@ def insert_user_detect():
 
 
 def query_detect_list(detect_type):
-    sql = 'SELECT detect_id from bili_detect where detect_type = ' + str(detect_type) + ' ORDER BY create_time DESC'
+    sql = 'SELECT detect_id from bili_detect where detect_type = ' + str(detect_type) + ' ORDER BY detect_id DESC'
     return sql
 
 
@@ -29,6 +29,10 @@ def replace_uv_count():
     sql = 'REPLACE INTO bili_uv_count(tid,count,name,user_id)values(%s,%s,%s,%s)'
     return sql
 
+
+def delete_detect_user(mid):
+    sql = 'delete FROM bili_detect WHERE detect_id = ' + mid + ' AND detect_type = 0'
+    return sql
 
 ######################################
 def insert_video_info():
@@ -57,5 +61,10 @@ def query_update_video_list():
 
 # 对已经更新过的视频检测数+1
 def update_video_detect_time(aid):
-    sql = 'update bili_detect set have_detect=have_detect+1 where detect_id = ' + str(aid)+' and detect_type=1'
+    sql = 'update bili_detect set have_detect=have_detect+1 where detect_id = ' + str(aid) + ' and detect_type=1'
+    return sql
+
+
+def update_complete_video_detect(aid):
+    sql = 'update bili_detect set have_detect=max_detect where detect_id = ' + str(aid) + ' and detect_type=1'
     return sql

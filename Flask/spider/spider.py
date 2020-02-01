@@ -2,6 +2,9 @@
 # 初始化爬取
 
 # import txt_io
+import logging
+
+import sys
 from Flask.spider import api_url as api
 from Flask.spider import package
 from Flask.util import prase_content
@@ -11,10 +14,12 @@ from Flask.sql.do_sql import Db
 from Flask.item import global_val as gl
 
 INIT_USER = 3043120
-MAX_USER_NUM = 20000
+MAX_USER_NUM = 100000
 START_NUM = 0
 
 db = Db()
+
+sys.setrecursionlimit(9000000)
 
 
 def return_header():
@@ -37,14 +42,21 @@ def init_parse_data():
 # 第一次爬取用户
 def init_parse_user(mid):
     global MAX_USER_NUM, START_NUM, db
-
+    user_following = []
+    user_follower = []
     db.insert_or_update(mid, table_sql.insert_user_detect())
     # 准备下一个迭代
     # 用户关注与被关注列表
-    user_following = prase_content.return_json(api.return_user_follow(1, 10, mid), None,
-                                               return_header()).get('data').get('list')
-    user_follower = prase_content.return_json(api.return_user_fans(1, 10, mid), None,
-                                              return_header()).get('data').get('list')
+    user_following_json = prase_content.return_json(api.return_user_follow(1, 10, mid), None,
+                                                    return_header())
+    user_follower_json = prase_content.return_json(api.return_user_fans(1, 10, mid), None,
+                                                   return_header())
+    try:
+        user_following = user_following_json.get('data').get('list')
+        user_follower = user_follower_json.get('data').get('list')
+
+    except AttributeError as aerr:
+        logging.exception(aerr)
     # 将关注的人放入数据库，即这些人为爬取对象
     for i in user_following:
         # print(i.get('mid'))
@@ -58,7 +70,7 @@ def init_parse_user(mid):
     random_user = user_list[random.randint(0, len(user_list) - 1)]
     # 判断爬取人数是否够
     if START_NUM < MAX_USER_NUM:
-        init_parse_user(random_user['mid'])
+        return init_parse_user(random_user['mid'])
     else:
         return
 
@@ -80,11 +92,13 @@ def parse_user_info(mid):
     global MAX_USER_NUM, START_NUM, db
 
     # 用户基本信息解析
-    print('parse .....')
-    print(mid)
     user_info_json = prase_content.return_json(api.return_user_info(mid), None, return_header())
     user_info_ff_json = prase_content.return_json(api.return_user_follower_following(mid), None, return_header())
-    user_video_count_json = prase_content.return_json(api.return_user_video_count(mid), None, return_header())
+    # 用户不存在，或无意义账号
+    if user_info_json.get('code') != 0:
+        db.insert_or_update(item=None, sql=table_sql.delete_detect_user(mid))
+        return
+    user_video_count_json = prase_content.return_json(api.return_user_video_count(mid, None), None, return_header())
     user_video_count = user_video_count_json.get('data').get('count')
     user_object = package.package_user_info(user_info_json, user_info_ff_json, user_video_count)
     user_official = package.package_user_official(user_info_json)
@@ -97,7 +111,6 @@ def parse_user_info(mid):
     for i in user_video_category:
         uv_info = package.package_video_count(user_video_category[i], user_info_json.get('data').get('mid'))
         db.insert_or_update(item=uv_info.return_tup(), sql=table_sql.replace_uv_count())
-    print('parsed')
     return user_object
 
 
@@ -129,7 +142,13 @@ def update_video():
 # 添加用户新视频检测
 def insert_new_video(mid):
     global db
-    yesterday_video_count = db.select(table_sql.query_yesterday_user_video_count(mid))[0][0]
+    yesterday_video_count = db.select(table_sql.query_yesterday_user_video_count(mid))
+    if len(yesterday_video_count) == 0:
+        # 该天的数据缺失
+        return
+    # print(yesterday_video_count)
+    yesterday_video_count = yesterday_video_count[0][0]
+    # print(yesterday_video_count)
     # print('mid: '+str(mid)+'; 昨日视频数:'+str(yesterday_video_count))
     # print(yesterday_video_count)
     current_video_count_json = prase_content.return_json(api.return_user_video_count(mid, None), None, return_header())
@@ -151,6 +170,10 @@ def insert_new_video(mid):
 def update_old_video(aid):
     # print('更新已有视频：'+str(aid))
     video_json = prase_content.return_json(api.return_video_info(aid), None, return_header())
+    # 视频不存在，或以删除，则让视频侦测完毕
+    if video_json.get('code') != 0:
+        db.insert_or_update(item=None, sql=table_sql.update_complete_video_detect(aid))
+        return
     video_info = package.package_video_info(video_json)
     db.insert_or_update(item=video_info.return_tup(), sql=table_sql.insert_video_info())
     db.insert_or_update(item=None, sql=table_sql.update_video_detect_time(aid))

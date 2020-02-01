@@ -1,6 +1,6 @@
 # 解析网址
+import logging
 import random
-import re
 import json
 import time
 
@@ -11,13 +11,21 @@ from requests import RequestException
 def return_html(url, data, head):
     try:
         response = requests.get(url, params=data, headers=head)
+        # print(response.status_code)
         if response.status_code == 200:
             text = response.text
             return text
+        elif response.status_code == 404:
+            logging.error(str(url) + "已失效")
+            raise Exception(str(url) + "已失效")
         else:
-            return str(response.status_code)
-    except RequestException:
-        return "RequestException"
+            logging.debug("被侦测，睡眠360秒")
+            time.sleep(360)
+            return return_html(url, data, head)
+
+    except RequestException as rex:
+        logging.debug('网页解析出问题')
+        logging.error(rex)
 
 
 def html_to_json(html):
@@ -27,5 +35,5 @@ def html_to_json(html):
 def return_json(url, data, head):
     html = return_html(url, data, head)
     result = html_to_json(html)
-    time.sleep(random.random())
+    # time.sleep(random.random())
     return result
