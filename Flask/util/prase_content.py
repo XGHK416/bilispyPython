@@ -35,5 +35,5 @@ def html_to_json(html):
 def return_json(url, data, head):
     html = return_html(url, data, head)
     result = html_to_json(html)
-    # time.sleep(random.random())
+    time.sleep(random.uniform(0, 0.2))
     return result

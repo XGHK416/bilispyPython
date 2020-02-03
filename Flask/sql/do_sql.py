@@ -17,10 +17,12 @@ class Db(object):
             # print(sql)
             self.cursor.execute(sql, item)
             self.db.commit()
+            return True
         except Exception as exc:
-            logging.error(exc)
+            logging.warning(exc)
             self.db.rollback()
-            self.db.close()
+            return False
+            # self.db.close()
 
     def select(self, sql):
         try:

@@ -8,11 +8,15 @@
         $(function () {
             function do_detect(){
                 $.get("/get_detect_info",function (data) {
-                    var datas = eval('(' + data + ')')
+                    const datas = eval('(' + data + ')');
                     console.log(datas)
                     $('#action').html("当前进行进程: "+datas['current_task'])
-                    $('#spider_user_num').html("以爬取用户数据: "+datas['current_user_num'])
-                    $('#spider_video_num').html("以爬取视频数据: "+datas['current_video_num'])
+                    $('#spider_user_num').html("以爬取用户数据: "+datas['current_user'])
+                    $('#spider_video_num').html("以爬取视频数据: "+datas['current_video'])
+                    $('#total_user_num').html("总共用户数据: "+datas['total_user'])
+                    $('#total_video_num').html("总共视频数据: "+datas['total_video'])
+                    $('#have_time').html("已运行时间: "+datas['have_time'])
+                    $('#task_status').html("运行状态: "+datas['status'])
                 })
             }
             setInterval(do_detect,5000)
@@ -45,6 +49,10 @@
             </h2>
             <h2 id="spider_user_num">以更新用户数据：--</h2>
             <h2 id="spider_video_num">以更新视频数据：--</h2>
+            <h3 id="total_user_num">总共用户数据：--</h3>
+            <h3 id="total_video_num">总共视频数据：--</h3>
+            <h3 id="have_time">已运行时间：--</h3>
+            <h3 id="task_status">运行状态：--</h3>
         </div>
     </div>
 </body>

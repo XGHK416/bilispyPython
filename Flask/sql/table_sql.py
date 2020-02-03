@@ -31,7 +31,7 @@ def replace_uv_count():
 
 
 def delete_detect_user(mid):
-    sql = 'delete FROM bili_detect WHERE detect_id = ' + mid + ' AND detect_type = 0'
+    sql = 'delete FROM bili_detect WHERE detect_id = ' + str(mid) + ' AND detect_type = 0'
     return sql
 
 ######################################

@@ -1,4 +1,5 @@
 # app.py
+import copy
 import datetime
 import logging
 from flask import Flask, render_template
@@ -6,6 +7,7 @@ from flask import Flask, render_template
 from flask_apscheduler import APScheduler
 from Flask.item import global_val as gl
 from Flask.spider import spider
+from Flask.util import enum
 
 
 class Config(object):
@@ -15,15 +17,6 @@ class Config(object):
 scheduler = APScheduler()
 
 gl._init()
-gl.set_zero('CURRENT_SPIDER_MID')
-gl.set_zero('CURRENT_SPIDER_AID')
-gl.set_value('STATE', 200)
-gl.set_value('TOTAL_VIDEO_NUM', 0)
-gl.set_value('TOTAL_USER_NUM', 0)
-gl.set_value('CURRENT_VIDEO_NUM', 0)
-gl.set_value('CURRENT_USER_NUM', 0)
-gl.set_value('TASK_NAME', '--')
-gl.set_value('INIT_MID', 3043120)
 
 app = Flask(__name__, template_folder="./template")
 
@@ -34,83 +27,77 @@ app = Flask(__name__, template_folder="./template")
 def init_spider_user():
     try:
         app.logger.debug('开始init_parse_data')
-        gl.set_value('TASK_NAME', '初始化爬取用户')
+        gl.set_value('current_task', enum.TaskList.init_parse_data.value)
+        gl.set_value('status', enum.Status.Continue.value)
         start = datetime.datetime.now()
+        gl.set_value('start_time', start)
+
         spider.init_parse_data()
+
         end = datetime.datetime.now()
         runtime = start - end
-        app.logger.debug('init_runtime:' + str(runtime))
-        gl.set_value('TOTAL_USER_NUM', gl.get_value('CURRENT_USER_NUM'))
-        gl.set_value('CURRENT_USER_NUM', 0)
-        gl.set_value('TASK_NAME', 'complete')
+        gl._init()
+        app.logger.debug('runtime:' + str(runtime))
     except Exception as exc:
         app.logger.error(exc)
-        gl.set_value('STATE', 300)
-        gl.set_value('CURRENT_USER_NUM', 0)
-        gl.set_value('TASK_NAME', '--')
+        gl.set_value('status', enum.Status.Error.value)
         scheduler.pause_job('init_parse_data')
 
 
 # 更新用户
-@scheduler.task('cron', id='update_spider_user', start_date='2020-02-1', day_of_week='*', hour='18',
+@scheduler.task('cron', id='update_spider_user', start_date='2020-02-4', day_of_week='*', hour='4',
                 misfire_grace_time=900)
 def update_spider_user():
     try:
-        gl.set_value('TASK_NAME', '更新用户爬取')
+        app.logger.debug('开始update_spider_user')
+        gl.set_value('current_task', enum.TaskList.update_spider_user.value)
+        gl.set_value('status', enum.Status.Continue.value)
         start = datetime.datetime.now()
+        gl.set_value('start_time', start)
 
         spider.update_parse_user()
 
         end = datetime.datetime.now()
         runtime = start - end
-        app.logger.debug('init_runtime:' + str(runtime))
-
-        gl.set_value('TASK_NAME', 'complete')
-        gl.set_value('CURRENT_USER_NUM', 0)
+        gl._init()
+        app.logger.debug('runtime:' + str(runtime))
     except Exception as exc:
         app.logger.error(exc)
-        app.logger.error(gl.get_value('CURRENT_SPIDER_MID'))
-        gl.set_value('TASK_NAME', '--')
-        gl.set_value('CURRENT_USER_NUM', 0)
-        gl.set_value('STATE', 300)
+        gl.set_value('status', enum.Status.Error.value)
         scheduler.pause_job('update_spider_user')
 
 
 # 更新视频
-@scheduler.task('cron', id='update_video', start_date='2020-02-1', day_of_week='*', hour='12',
+@scheduler.task('cron', id='update_video', start_date='2020-02-4', day_of_week='*', hour='12',
                 misfire_grace_time=900)
 def update_video():
     try:
-        gl.set_value('TASK_NAME', '更新视频资源')
+        app.logger.debug('开始update_video')
+        gl.set_value('current_task', enum.TaskList.update_video.value)
+        gl.set_value('status', enum.Status.Continue.value)
         start = datetime.datetime.now()
+        gl.set_value('start_time', start)
 
         spider.update_video()
 
         end = datetime.datetime.now()
         runtime = start - end
-        app.logger.debug('init_runtime:' + str(runtime))
-
-        gl.set_value('TASK_NAME', 'complete')
-        gl.set_value('CURRENT_VIDEO_NUM', 0)
+        gl._init()
+        app.logger.debug('runtime:' + str(runtime))
     except Exception as exc:
         app.logger.error(exc)
-        app.logger.error(gl.get_value('CURRENT_SPIDER_AID'))
-        gl.set_value('TASK_NAME', '--')
-        gl.set_value('CURRENT_VIDEO_NUM', 0)
-        gl.set_value('STATE', 300)
+        gl.set_value('status', enum.Status.Error.value)
         scheduler.pause_job('update_video')
 
 
 #########################################################
 @app.route("/get_detect_info")
 def get_detect_info():
-    result = {}
-    result['state'] = gl.get_value('STATE')
-    result['scheduler_state'] = scheduler.state
-    result['current_task'] = gl.get_value('TASK_NAME')
-    result['current_user_num'] = gl.get_value('CURRENT_USER_NUM')
-    result['current_video_num'] = gl.get_value('CURRENT_VIDEO_NUM')
-    result['total_user_num'] = gl.get_value('TOTAL_USER_NUM')
+    end_time = datetime.datetime.now()
+    start_time = gl.get_value('start_time')
+    result = copy.copy(gl.return_dict())
+    result['start_time'] = start_time.__str__()
+    result['have_time'] = (start_time-end_time).__str__()
     return str(result)
 
 

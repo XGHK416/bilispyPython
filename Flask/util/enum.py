@@ -24,5 +24,17 @@ class UserOfficial(enum.Enum):
     OFFICIAL_AUTHS = 3
 
 
+class TaskList(enum.Enum):
+    no_task = '没有任务'
+    init_parse_data = '初始化爬虫'
+    update_spider_user = '更新用户资料'
+    update_video = '更新视频资料'
+
+
+class Status(enum.Enum):
+    Continue = '执行中'
+    Error = '执行错误'
+    Wait = '等待执行'
+
 if __name__ == '__main__':
     print(UserLevel('level0').name)
