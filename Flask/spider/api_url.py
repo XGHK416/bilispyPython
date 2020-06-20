@@ -23,7 +23,7 @@ def return_video_info(aid):
 def return_user_video_count(mid, num):
     if num is not None:
         return 'https://space.bilibili.com/ajax/member/getSubmitVideos?mid=' + str(
-            mid) + '&pagesize=' + str(num) + '&tid=0&page=1&order=pubdate'
+            mid) + '&pagesize=' + str(num)
     else:
         return 'https://space.bilibili.com/ajax/member/getSubmitVideos?mid=' + str(
-            mid) + '&pagesize=1&tid=0&page=1&order=pubdate'
+            mid) + '&pagesize=1'

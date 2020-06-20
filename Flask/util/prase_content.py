@@ -9,8 +9,10 @@ from requests import RequestException
 
 
 def return_html(url, data, head):
+    # time.sleep(random.uniform(0.1, 0.3))
     try:
         response = requests.get(url, params=data, headers=head)
+        # print(response)
         # print(response.status_code)
         if response.status_code == 200:
             text = response.text
@@ -19,9 +21,8 @@ def return_html(url, data, head):
             logging.error(str(url) + "已失效")
             raise Exception(str(url) + "已失效")
         else:
-            logging.debug("被侦测，睡眠360秒")
-            time.sleep(360)
-            return return_html(url, data, head)
+            time.sleep(900)
+            return None
 
     except RequestException as rex:
         logging.debug('网页解析出问题')
@@ -33,7 +34,9 @@ def html_to_json(html):
 
 
 def return_json(url, data, head):
+    time.sleep(0.4)
     html = return_html(url, data, head)
+    if html is None:
+        return None
     result = html_to_json(html)
-    time.sleep(random.uniform(0, 0.2))
     return result

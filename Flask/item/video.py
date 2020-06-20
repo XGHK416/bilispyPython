@@ -2,9 +2,22 @@
 # 请务必加上返回元组的方法return_tup，以便插入数据库
 
 
+class VideoBvid(object):
+    video_id = 0
+    video_bvid = ''
+
+    def __init__(self, video_id, video_bvid):
+        self.video_id = video_id
+        self.video_bvid = video_bvid
+
+    def return_tup(self):
+        return (self.video_id, self.video_bvid)
+
+
 class VideoInfo(object):
     video_id = 0
     tid = 0
+    tname = ''
     video_title = '未知'
     video_profile = None
     create_time = 0
@@ -19,10 +32,13 @@ class VideoInfo(object):
     video_author = ''
     author_mid = 0
 
-    def __init__(self, video_id, tid, video_title, video_profile, create_time, video_desc, video_view, video_favorite,
+    def __init__(self, video_id, tid, tname, video_title, video_profile, create_time, video_desc,
+                 video_view,
+                 video_favorite,
                  coins, video_share, video_like,
                  reply, dynamic,
                  video_author, author_mid):
+        self.tname = tname
         self.author_mid = author_mid
         self.video_author = video_author
         self.dynamic = dynamic
@@ -40,7 +56,7 @@ class VideoInfo(object):
         self.video_id = video_id
 
     def return_tup(self):
-        return (self.video_id, self.tid, self.video_title,
+        return (self.video_id, self.tid, self.tname, self.video_title,
                 self.video_profile, self.create_time, self.video_desc,
                 self.video_view, self.video_favorite,
                 self.coins, self.video_share,

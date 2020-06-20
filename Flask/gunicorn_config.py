@@ -6,7 +6,7 @@ import multiprocessing
 
 bind = "172.24.27.156:5000"
 workers = 1
-loglevel = 'debug'
+loglevel = 'DEBUG'
 access_log_format = '%(t)s %(p)s %(h)s "%(r)s" %(s)s %(L)s %(b)s %(f)s" "%(a)s"'
 
 accesslog = "/www/wwwhome/spider_flask/log/unicorn_access.log"      #访问日志文件

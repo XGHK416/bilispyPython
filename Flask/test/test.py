@@ -32,6 +32,7 @@ def update_video():
 if __name__ == '__main__':
     # db.start_sql_engine()
     # gl._init()
+    # print(gl.return_dict())
     print("开始测试")
     # spider.parse_user_info(172717879)
     # for i in range(1,1000):
@@ -41,11 +42,11 @@ if __name__ == '__main__':
     # spider.update_parse_user()
     # spider.parse_user_info(351383162)
 
-    spider.insert_new_video(388520323)
+    spider.insert_new_video(11783021)
     # spider.new_video_detect(10280)
 
     # user_init()
     # user_update()
-    # update_video()
+    # spider.update_video()
     # db.close_db()
     print("结束测试")

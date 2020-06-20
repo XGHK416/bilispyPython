@@ -7,13 +7,13 @@ def insert_user_detect():
 
 
 def query_detect_list(detect_type):
-    sql = 'SELECT detect_id from bili_detect where detect_type = ' + str(detect_type) + ' ORDER BY detect_id DESC'
+    sql = 'SELECT detect_id from bili_detect where detect_type = ' + str(detect_type) + ' ORDER BY detect_id ASC'
     return sql
 
 
 #######################################
 def insert_user_info():
-    sql = 'INSERT INTO bili_user(user_id,nick_name,profile,sex,level,sign,silence,vip,birthday,video_count,follower,following,last_update) ' \
+    sql = 'INSERT INTO bili_uploader(user_id,nick_name,profile,sex,level,sign,silence,vip,birthday,video_count,follower,following,last_update) ' \
           'values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now()) '
     # if user_id is not None:
     #     sql = sql + 'ON DUPLICATE KEY UPDATE user_id=' + str(user_id)
@@ -36,18 +36,21 @@ def delete_detect_user(mid):
 
 ######################################
 def insert_video_info():
-    sql = 'INSERT INTO bili_video(video_id,tid,video_title,video_profile,create_time,video_desc,video_view,video_favorite,coins,video_share,video_like,reply,dynamic,video_author,author_mid,last_update)' \
-          'values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now())'
+    sql = 'INSERT INTO bili_video(video_id,tid,tname,video_title,video_profile,create_time,video_desc,video_view,video_favorite,coins,video_share,video_like,reply,dynamic,video_author,author_mid,last_update)' \
+          'values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now())'
     return sql
 
+def insert_video_bvid():
+    sql = 'INSERT INTO bili_video_bvid(video_id,video_bvid) values (%s,%s)'
 
-# 检查昨日用户视频数
+
+# 检查上上次用户视频数
 def query_yesterday_user_video_count(mid):
-    sql = 'SELECT video_count from bili_user where to_days(now())-to_days(last_update)=1 and user_id =' + str(mid)
+    sql = 'Select video_count from bili_uploader WHERE user_id = ' + str(mid) + ' Order By last_update DESC limit 1,1'
     return sql
 
 
-# 新建需要更新的视频列表
+# 新建需要更新的视频列表 
 def insert_detect_video():
     sql = 'INSERT INTO bili_detect(detect_id,detect_type,have_detect,max_detect,update_time,create_time)values(%s,1,1,7,now(),now()) '
     return sql

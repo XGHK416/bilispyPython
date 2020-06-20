@@ -35,6 +35,7 @@ def package_video_info(video_info):
     return video.VideoInfo(
         video_id=video_data.get('aid'),
         tid=video_data.get('tid'),
+        tname=video_data.get('tname'),
         video_title=video_data.get('title'),
         video_profile=video_data.get('pic'),
         create_time=current_time,
@@ -48,6 +49,14 @@ def package_video_info(video_info):
         dynamic=video_data.get('dynamic'),
         video_author=video_data.get('owner').get('name'),
         author_mid=video_data.get('owner').get('mid'),
+    )
+
+
+def package_video_bvid(video_info):
+    video_data = video_info.get('data')
+    return video.VideoBvid(
+        video_id=video_data.get('aid'),
+        video_bvid=video_data.get('bvid'),
     )
 
 
@@ -67,4 +76,3 @@ def package_video_count(user_video_category, mid):
         count=user_video_category.get('count'),
         name=user_video_category.get('name'),
     )
-
